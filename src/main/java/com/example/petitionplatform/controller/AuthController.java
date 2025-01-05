@@ -1,27 +1,30 @@
 package com.example.petitionplatform.controller;
 
+import com.example.petitionplatform.dto.LoginRequest;
+import com.example.petitionplatform.dto.RegisterRequest;
+import com.example.petitionplatform.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    private final AuthService authService;
 
     @Autowired
-    private AuthService authService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @ResponseBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @ResponseBody LoginRequest request) {
-        return authService.login(request);
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        return authService.authenticate(request);
     }
 }

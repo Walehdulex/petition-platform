@@ -1,0 +1,37 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    margin-top: 50px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 2px solid #f0f0f0;
+    padding: 20px;
+}
+
+/* Add to login.css */
+#qrReader {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#qrScanner {
+    padding: 20px;
+}
+
+#qrScanner video {
+    width: 100% !important;
+    border-radius: 10px;
+}
+
+button#scanQR:hover {
+    background-color: #5a6268;
+}
+
+.d-none {
+    display: none !important;
+}

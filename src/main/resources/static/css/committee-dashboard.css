@@ -1,6 +1,12 @@
 /* committee-dashboard.css */
 .card {
+    margin-bottom: 1.5rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.075);
 }
 
 .table {
@@ -22,6 +28,10 @@
 .btn-group .btn:first-child {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
+}
+
+canvas {
+    max-height: 300px;
 }
 
 .btn-group .btn:last-child {

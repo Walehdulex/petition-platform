@@ -1,6 +1,8 @@
 // Global variables
 let currentThreshold = 0;
 let currentFilter = 'all';
+let statusChart = null;
+let signaturesChart = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
@@ -145,7 +147,117 @@ function displayPetitions(petitions) {
         const row = createPetitionRow(petition);
         tableBody.appendChild(row);
     });
+
+    //Update Charts
+    updateCharts(petitions);
 }
+
+function updateCharts(petitions) {
+    try {
+        console.log('Updating charts with petitions:', petitions);
+        updateStatusChart(petitions);
+        updateSignaturesChart(petitions);
+    } catch (error) {
+        console.error('Error updating charts:', error);
+    }
+}
+
+function updateStatusChart(petitions) {
+    const statusData = {
+        open: petitions.filter(p => p.status === 'OPEN').length,
+        closed: petitions.filter(p => p.status === 'CLOSED').length
+    };
+
+    const ctx = document.getElementById('statusChart').getContext('2d');
+
+    // Destroy existing chart if it exists
+    if (statusChart) {
+        statusChart.destroy();
+    }
+
+    statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Open', 'Closed'],
+            datasets: [{
+                data: [statusData.open, statusData.closed],
+                backgroundColor: ['#28a745', '#dc3545'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Petition Status Distribution'
+                }
+            }
+        }
+    });
+}
+
+function updateSignaturesChart(petitions) {
+    // Sort petitions by signature count
+    const sortedPetitions = [...petitions]
+        .sort((a, b) => (b.signatures || 0) - (a.signatures || 0))
+        .slice(0, 5); // Take top 5
+
+    const ctx = document.getElementById('signaturesChart').getContext('2d');
+
+    // Destroy existing chart if it exists
+    if (signaturesChart) {
+        signaturesChart.destroy();
+    }
+
+    signaturesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedPetitions.map(p => truncateTitle(p.petitionTitle)),
+            datasets: [{
+                label: 'Number of Signatures',
+                data: sortedPetitions.map(p => p.signatures || 0),
+                backgroundColor: '#0d6efd',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Signatures'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Petitions'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Top 5 Petitions by Signatures'
+                }
+            }
+        }
+    });
+}
+
+
+
+
+
 
 function createPetitionRow(petition) {
     const row = document.createElement('tr');

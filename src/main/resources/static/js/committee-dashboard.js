@@ -254,9 +254,10 @@ function updateSignaturesChart(petitions) {
     });
 }
 
-
-
-
+// Helper function to truncate long titles
+function truncateTitle(title) {
+    return title.length > 20 ? title.substring(0, 20) + '...' : title;
+}
 
 
 function createPetitionRow(petition) {

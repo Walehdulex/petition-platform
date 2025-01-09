@@ -131,6 +131,6 @@ async function signPetition(petitionId) {
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while signing the petition');
+        alert('You signed petition already');
     }
 }

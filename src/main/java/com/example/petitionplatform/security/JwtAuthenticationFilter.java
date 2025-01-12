@@ -20,8 +20,8 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private JwtTokenProvider tokenProvider;
-    private PetitionerRepository petitionerRepository;
+    private final JwtTokenProvider tokenProvider;
+    private final PetitionerRepository petitionerRepository;
 
     @Autowired
     public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, PetitionerRepository petitionerRepository) {

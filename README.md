@@ -1,5 +1,9 @@
 # Shangri-La Petition Platform (SLPP)
 
+Category: Web Application
+- Language: Java
+- Framework: Spring Boot (Backend) with Thymeleaf + Bootstrap (Frontend)
+
 ## Project Overview
 SLPP is a web-based platform designed to facilitate citizen participation in parliamentary discussions through petitions. Citizens of Shangri-La can create, sign, and track petitions on matters within the government's responsibility.
 
@@ -102,7 +106,7 @@ Edit src/main/resources/application.properties:
 * Interactive Charts
 
 # Project Structure
-![img.png](img.png)
+![img_2.png](img_2.png)
 
 # Security Features
 
@@ -139,4 +143,4 @@ This is a coursework project and is not open for contributions.
 
 ### **License**
 
-This project is created for educational purposes as part of university coursework.
+This project is created for educational purposes as part of my university coursework.

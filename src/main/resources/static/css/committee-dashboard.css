@@ -64,3 +64,15 @@ canvas {
     max-height: 600px;
     overflow-y: auto;
 }
+
+/* Add to committee-dashboard.css */
+#wordCloud {
+    background: #ffffff;
+    border-radius: 4px;
+}
+
+#wordCloud text:hover {
+    fill: #007bff !important;
+    transform: scale(1.1);
+    transition: transform 0.2s;
+}

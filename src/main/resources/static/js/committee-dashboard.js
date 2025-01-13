@@ -3,6 +3,7 @@ let currentThreshold = 0;
 let currentFilter = 'all';
 let statusChart = null;
 let signaturesChart = null;
+let currentPetitions = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
@@ -133,6 +134,98 @@ async function submitResponse(petitionId, response) {
     }
 }
 
+// Word cloud generation
+function generateWordCloud(petitions) {
+    // Extract text from petitions
+    const text = petitions
+        .map(petition => `${petition.petitionTitle} ${petition.petitionText}`)
+        .join(' ');
+
+    // Process text and count word frequencies
+    const words = text.toLowerCase()
+        .replace(/[^\w\s]/g, '')
+        .split(/\s+/)
+        .filter(word => word.length > 3) // Filter out short words
+        .reduce((acc, word) => {
+            acc[word] = (acc[word] || 0) + 1;
+            return acc;
+        }, {});
+
+    // Convert to format needed for d3-cloud
+    const wordData = Object.entries(words)
+        .filter(([_, count]) => count > 1) // Filter out words that appear only once
+        .map(([text, size]) => ({
+            text,
+            size: 10 + (size * 5) // Scale font size
+        }));
+
+    // Generate cloud
+    d3.layout.cloud()
+        .size([800, 400])
+        .words(wordData)
+        .padding(5)
+        .rotate(() => ~~(Math.random() * 2) * 90)
+        .fontSize(d => d.size)
+        .on("end", drawWordCloud)
+        .start();
+}
+
+function drawWordCloud(words) {
+    // Clear previous word cloud
+    d3.select("#wordCloud").select("svg").remove();
+
+    // Create new SVG
+    const svg = d3.select("#wordCloud")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "400px")
+        .attr("viewBox", "0 0 800 400")
+        .append("g")
+        .attr("transform", "translate(400,200)");
+
+    // Add words
+    svg.selectAll("text")
+        .data(words)
+        .enter().append("text")
+        .style("font-size", d => `${d.size}px`)
+        .style("fill", d => d3.interpolateViridis(Math.random()))
+        .attr("text-anchor", "middle")
+        .attr("transform", d => `translate(${[d.x, d.y]})rotate(${d.rotate})`)
+        .text(d => d.text)
+        .style("cursor", "pointer")
+        .on("click", function(event, d) {
+            showWordStats(d.text);
+        });
+}
+
+function showWordStats(word) {
+    const petitionsWithWord = currentPetitions.filter(petition =>
+        (petition.petitionTitle + " " + petition.petitionText)
+            .toLowerCase()
+            .includes(word.toLowerCase())
+    );
+
+    const modalContent = `
+        <div class="modal-header">
+            <h5 class="modal-title">Statistics for "${word}"</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <p>This topic appears in ${petitionsWithWord.length} petitions.</p>
+            <h6>Related Petitions:</h6>
+            <ul>
+                ${petitionsWithWord
+        .map(p => `<li>${p.petitionTitle} (${p.signatures} signatures)</li>`)
+        .join('')}
+            </ul>
+        </div>
+    `;
+
+    const modal = document.getElementById('wordStatsModal');
+    modal.querySelector('.modal-content').innerHTML = modalContent;
+    new bootstrap.Modal(modal).show();
+}
+
 
 function displayPetitions(petitions) {
     const tableBody = document.getElementById('petitionsTableBody');
@@ -150,6 +243,7 @@ function displayPetitions(petitions) {
 
     //Update Charts
     updateCharts(petitions);
+    generateWordCloud(petitions);
 }
 
 function updateCharts(petitions) {
@@ -441,29 +535,6 @@ function viewPetitionDetails(petition) {
     }
 }
 
-// function createActionButtons(petition, hasMetThreshold) {
-//     return `
-//         <div class="btn-group">
-//             <button class="btn btn-outline-primary btn-sm"
-//                     onclick='viewPetitionDetails(${JSON.stringify(petition)})'>
-//                 View Details
-//             </button>
-//             ${petition.status === 'OPEN' && hasMetThreshold ? `
-//                 <button class="btn btn-primary btn-sm ms-1"
-//                         onclick="showResponseModal('${petition.petitionId}')">
-//                     Respond
-//                 </button>
-//             ` : ''}
-//             ${petition.response ? `
-//                 <button class="btn btn-info btn-sm ms-1 view-response-btn"
-//                         data-response="${encodeURIComponent(petition.response)}">
-//                     View Response
-//                 </button>
-//             ` : ''}
-//         </div>
-//     `;
-// }
-
 function createActionButtons(petition, hasMetThreshold) {
     const sanitizedPetition = JSON.stringify(petition).replace(/'/g, '&#39;');
     return `
@@ -602,5 +673,34 @@ async function submitResponse(petitionId, response) {
         }
     } catch (error) {
         handleError('Error submitting response', error);
+    }
+}
+
+//Exporting file js script
+async function exportReport(type) {
+    try {
+        const response = await fetch(`/api/export/petitions/${type}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (response.ok) {
+            // Create a blob from the response
+            const blob = await response.blob();
+            // Create a link to download the file
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `petitions_report.${type}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } else {
+            alert('Failed to generate report');
+        }
+    } catch (error) {
+        console.error('Error exporting report:', error);
+        alert('Error generating report');
     }
 }

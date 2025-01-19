@@ -9,5 +9,6 @@ public interface PetitionerRepository extends JpaRepository<Petitioner, Long> {
     Optional<Petitioner> findByEmail(String email);
     boolean existsByBioId(String bioId);
     boolean existsByEmail(String email);
+    Optional<Petitioner> findByEmailAndBioId(String email, String bioId);
 
 }

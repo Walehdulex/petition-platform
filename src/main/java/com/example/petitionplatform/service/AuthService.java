@@ -1,9 +1,6 @@
 package com.example.petitionplatform.service;
 
-import com.example.petitionplatform.dto.AuthResponse;
-import com.example.petitionplatform.dto.LoginRequest;
-import com.example.petitionplatform.dto.MessageResponse;
-import com.example.petitionplatform.dto.RegisterRequest;
+import com.example.petitionplatform.dto.*;
 import com.example.petitionplatform.exception.BioIdInvalidException;
 import com.example.petitionplatform.model.Petitioner;
 import com.example.petitionplatform.model.Role;
@@ -18,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -110,7 +108,53 @@ public class AuthService {
                     .body(new MessageResponse("Authentication failed: " + e.getMessage()));
         }
     }
+
+    public ResponseEntity<?> resetPassword(ResetPasswordRequest request) {
+        try {
+            // Find petitioner by email and bioId
+            Petitioner petitioner = petitionerRepository.findByEmailAndBioId(
+                            request.getEmail(),
+                            request.getBioId())
+                    .orElseThrow(() -> new RuntimeException("Invalid email or BioID"));
+
+            // Generate new random password
+            String newPassword = generateRandomPassword();
+
+            // Update password in database
+            petitioner.setPassword(passwordEncoder.encode(newPassword));
+            petitionerRepository.save(petitioner);
+
+            // Send email with new password
+            sendPasswordResetEmail(petitioner.getEmail(), newPassword);
+
+            return ResponseEntity.ok(new MessageResponse("Password has been reset. Check your email for the new password."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Failed to reset password: " + e.getMessage()));
+        }
+    }
+
+    private String generateRandomPassword() {
+        // Generate a random 12-character password
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder();
+
+        for (int i = 0; i < 12; i++) {
+            password.append(chars.charAt(random.nextInt(chars.length())));
+        }
+
+        return password.toString();
+    }
+
+    private void sendPasswordResetEmail(String email, String newPassword) {
+        // Implement email sending logic here
+        // For now, just print to console
+        System.out.println("Password reset email sent to: " + email);
+        System.out.println("New password: " + newPassword);
+    }
 }
+
 
 
 

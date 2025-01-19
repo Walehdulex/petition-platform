@@ -1,4 +1,6 @@
+console.log('Login.js loaded');
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded');
     const loginForm = document.getElementById('loginForm');
     const errorMessage = document.getElementById('errorMessage');
 
@@ -50,3 +52,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Forgot password
+const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('Forgot password form submitted');
+
+        const formData = {
+            email: document.getElementById('resetEmail').value,
+            bioId: document.getElementById('resetBioId').value
+        };
+
+        try {
+            const response = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.message);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+                modal.hide();
+            } else {
+                alert(data.message || 'Failed to reset password');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while resetting password');
+        }
+    });
+}

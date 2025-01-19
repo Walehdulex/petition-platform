@@ -32,6 +32,33 @@
                     </form>
                     <div class="text-center mt-3">
                         <a href="/register">Don't have an account? Register</a>
+                        <br>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot Password</a>
+                    </div>
+                </div>
+
+                <!-- Forgot Password Modal -->
+                <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Reset Password</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="forgotPasswordForm">
+                                    <div class="mb-3">
+                                        <label for="resetEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="resetEmail" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="bioId" class="form-label">BioID</label>
+                                        <input type="text" class="form-control" id="bioId" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Reset Password</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

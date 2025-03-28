@@ -33,7 +33,7 @@ SLPP is a web-based platform designed to facilitate citizen participation in par
 ## Installation and Setup
 1. Clone the repository:
 
-        git clone [repository-url]
+        git clone https://github.com/Walehdulex/petition-platform
 
         cd petition-platform
 

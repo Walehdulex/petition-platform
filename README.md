@@ -69,7 +69,7 @@ Edit src/main/resources/application.properties:
 * Pre-defined admin account:
 
   * Email: admin@petition.parliament.sr
-  * Password: 2025%shangrila
+  * Password: xxxxxxxxx
   
 
 * Set signature thresholds
